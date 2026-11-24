@@ -123,6 +123,7 @@ fn ask(title: &str, _: &str, default: &str, _: u32) -> Option<String> {
     title.starts_with("Type").then(|| format!("{default}typed"))
 }
 
+#[cfg(windows)]
 mod dialog {
     use windows_sys::Win32::Foundation::{HWND, LPARAM, WPARAM};
     use windows_sys::Win32::System::LibraryLoader::GetModuleHandleW;
@@ -232,6 +233,19 @@ mod dialog {
                 _ => 0,
             }
         }
+    }
+}
+
+/// No host dialog off Windows: dismiss it, like ESC on the real one.
+#[cfg(not(windows))]
+mod dialog {
+    pub(super) fn ask(
+        _: &str,
+        _: &str,
+        _: &str,
+        _: u32,
+    ) -> Option<String> {
+        None
     }
 }
 
